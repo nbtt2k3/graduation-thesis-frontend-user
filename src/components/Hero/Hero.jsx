@@ -9,12 +9,6 @@ const Hero = () => {
       >
         {/* LEFT SIDE */}
         <div className='flex-1 p-2 sm:p-4 flex items-end'>
-          <div>
-            <p className='text-white max-w-xs line-clamp-2 text-sm sm:text-base md:text-lg'>
-              iPhone 16 dự kiến sẽ tiếp tục cải tiến về hiệu năng với chip xử lý mạnh mẽ hơn và tối ưu hóa pin. Máy được trang bị màn hình sắc nét, công nghệ camera nâng cấp cho chất lượng hình ảnh vượt trội, hỗ trợ chụp ảnh và quay video chuyên nghiệp hơn.
-            </p>
-            <button className='btn-white mt-2 sm:mt-4 md:mt-6 text-xs sm:text-sm md:text-base px-3 sm:px-4 py-1 sm:py-2'>Xem thêm</button>
-          </div>
         </div>
       </div>
     </section>

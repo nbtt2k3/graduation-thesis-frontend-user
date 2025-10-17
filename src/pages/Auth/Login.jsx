@@ -65,7 +65,7 @@ const Login = () => {
   };
 
   const handleGoogleLogin = () => {
-    window.location.href = `${import.meta.env.VITE_APP_API_URI}/user/google/`;
+    window.location.href = `${import.meta.env.VITE_APP_API_URI}/api/v1/user/google/`;
   };
 
   const togglePasswordVisibility = () => {

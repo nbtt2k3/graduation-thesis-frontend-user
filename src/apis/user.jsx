@@ -99,3 +99,10 @@ export const apiVerifyEmailChangeOTP = (data) =>
     method: "post",
     data,
   });
+
+export const apiLoginWithGoogle = (data) =>
+  axios({
+    url: `/user/loginWithGoogle`,
+    method: "post",
+    data,
+  });
