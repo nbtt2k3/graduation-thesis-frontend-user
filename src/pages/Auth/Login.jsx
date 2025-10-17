@@ -65,6 +65,9 @@ const Login = () => {
   };
 
   const handleGoogleLogin = () => {
+
+    console.log(`${import.meta.env.VITE_APP_API_URI}/api/v1/user/google/`)
+
     window.location.href = `${import.meta.env.VITE_APP_API_URI}/api/v1/user/google/`;
   };
 
