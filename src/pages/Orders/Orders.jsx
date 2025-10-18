@@ -23,56 +23,6 @@ const STATUS_OPTIONS = [
   { label: "Đã hủy", value: "cancelled" },
 ];
 
-const statusLabel = (status) => {
-  switch (status) {
-    case "pending":
-      return "Chờ xác nhận";
-    case "confirmed":
-      return "Đã xác nhận";
-    case "processing":
-      return "Đang chuẩn bị";
-    case "shipped":
-      return "Đã gửi đi";
-    case "out_for_delivery":
-      return "Đang giao hàng";
-    case "delivered":
-      return "Đã giao";
-    case "return_requested":
-      return "Yêu cầu trả hàng";
-    case "returned":
-      return "Đã trả hàng";
-    case "cancelled":
-      return "Đã hủy";
-    default:
-      return status;
-  }
-};
-
-const statusColor = (status) => {
-  switch (status) {
-    case "pending":
-      return "bg-blue-100 text-blue-800 border border-blue-200";
-    case "confirmed":
-      return "bg-teal-100 text-teal-800 border border-teal-200";
-    case "processing":
-      return "bg-yellow-100 text-yellow-800 border border-yellow-200";
-    case "shipped":
-      return "bg-cyan-100 text-cyan-800 border border-cyan-200";
-    case "out_for_delivery":
-      return "bg-orange-100 text-orange-800 border border-orange-200";
-    case "delivered":
-      return "bg-green-100 text-green-800 border border-green-200";
-    case "return_requested":
-      return "bg-purple-100 text-purple-800 border border-purple-200";
-    case "returned":
-      return "bg-purple-200 text-purple-900 border border-purple-300";
-    case "cancelled":
-      return "bg-red-100 text-red-800 border border-red-200";
-    default:
-      return "bg-gray-100 text-gray-800 border border-gray-200";
-  }
-};
-
 const Orders = () => {
   const [userOrders, setUserOrders] = useState([]);
   const [filterStatus, setFilterStatus] = useState("");
@@ -291,16 +241,6 @@ const Orders = () => {
               onClick={() => navigate(`/orders/${order.id_order}`)}
               className="bg-white border border-gray-200 rounded-lg p-4 mb-4 shadow-sm cursor-pointer transition hover:shadow-md"
             >
-              {/* Trạng thái đơn hàng - góc trên bên phải */}
-              <div
-                className={`absolute top-4 right-4 flex items-center gap-2 text-sm font-medium px-2 py-1 rounded-lg shadow-sm ${statusColor(
-                  order.status
-                )}`}
-              >
-                <span className="w-2 h-2 rounded-full bg-current"></span>
-                <span>{statusLabel(order.status)}</span>
-              </div>
-
               <div className="text-gray-700 flex flex-col gap-4">
                 <div className="flex flex-wrap gap-4">
                   {/* PRODUCT LIST */}
