@@ -125,7 +125,7 @@ const RelatedProduct = ({ productItemId }) => {
         >
           {uniqueProductItems.map((productItem) => (
             <SwiperSlide key={productItem._id} className="py-2">
-              <div className="w-full max-w-[260px] mx-auto transition-transform duration-300 hover:scale-105 hover:shadow-lg">
+              <div className="w-full max-w-[260px] mx-auto">
                 <Item productItem={productItem} />
               </div>
             </SwiperSlide>
