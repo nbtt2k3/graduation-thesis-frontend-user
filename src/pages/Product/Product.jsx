@@ -6,7 +6,7 @@ import {
   FaChevronRight,
   FaHeart,
 } from "react-icons/fa";
-import { useParams, useSearchParams } from "react-router-dom";
+import { useParams, useSearchParams, useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import ProductDescription from "../../components/ProductDescription/ProductDescription";
 import ProductFeature from "../../components/ProductFeature/ProductFeature";
@@ -101,6 +101,7 @@ const Product = () => {
   const { auth, fetchCart } = useContext(ShopContext);
   const { productId } = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
   const [product, setProduct] = useState(null);
   const [selectedItem, setSelectedItem] = useState(null);
   const [image, setImage] = useState("");
@@ -250,21 +251,34 @@ const Product = () => {
     async (productItemId) => {
       if (!auth.isLoggedIn) {
         toast.error("Bạn cần đăng nhập để thêm sản phẩm vào giỏ hàng!");
-        return;
+        return false;
       }
       try {
         const response = await apis.apiAddToCart({ productItemId });
         if (response.success) {
           fetchCart();
           toast.success("Sản phẩm đã được thêm vào giỏ hàng!");
+          return true;
         } else if (response.error?.code === "cart_limit") {
           toast.error("Giỏ hàng đã đạt giới hạn!");
+          return false;
         }
       } catch (error) {
         toast.error(error.msg || "Đã xảy ra lỗi khi thêm vào giỏ hàng.");
+        return false;
       }
     },
     [auth.isLoggedIn, fetchCart]
+  );
+
+  const buyNowHandler = useCallback(
+    async (productItemId) => {
+      const addedToCart = await addToCartHandler(productItemId);
+      if (addedToCart) {
+        navigate("/place-order");
+      }
+    },
+    [addToCartHandler, navigate]
   );
 
   const toggleWishlistHandler = useCallback(
@@ -944,6 +958,12 @@ const Product = () => {
               className="flex-1 bg-blue-600 text-white py-2 sm:py-3 md:py-4 rounded-xl font-medium text-sm sm:text-base md:text-lg hover:bg-blue-700 transition-colors"
             >
               Thêm vào giỏ hàng
+            </button>
+            <button
+              onClick={() => buyNowHandler(selectedItem._id)}
+              className="flex-1 bg-red-600 text-white py-2 sm:py-3 md:py-4 rounded-xl font-medium text-sm sm:text-base md:text-lg hover:bg-red-700 transition-colors"
+            >
+              Mua ngay
             </button>
             <button
               onClick={() => toggleWishlistHandler(selectedItem._id)}

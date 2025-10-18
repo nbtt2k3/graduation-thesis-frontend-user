@@ -19,7 +19,6 @@ const Item = ({ productItem }) => {
   const mainImage = productItem.thumbUrl || "/placeholder.svg";
   const rating = Math.max(0, Math.min(5, productItem.ratingAvg || 0));
   const productName = productItem.name || "Unnamed Product";
-  const reviewCount = Math.max(0, productItem.reviewCount || 0);
 
   const renderStars = () => {
     const stars = [];
@@ -106,7 +105,6 @@ const Item = ({ productItem }) => {
         <div className="mt-2 pt-2 border-t border-gray-100 flex items-center justify-between">
           <div className="flex items-center gap-1">
             {renderStars()}
-            <span className="text-xs text-gray-500">({reviewCount})</span>
           </div>
         </div>
       </div>
