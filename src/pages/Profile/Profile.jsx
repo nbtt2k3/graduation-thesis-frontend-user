@@ -7,6 +7,7 @@ import AddressForm from "./AddressForm";
 import AddressList from "./AddressList";
 import PasswordForm from "./PasswordForm";
 import VoucherList from "./VoucherList";
+import Wishlist from "./Wishlist";
 import * as apis from "../../apis";
 import { isValidVietnamCoordinates } from "./utils";
 
@@ -18,6 +19,7 @@ const Sidebar = ({ activeTab, setActiveTab, className }) => {
     { id: "address", label: "Địa chỉ" },
     { id: "vouchers", label: "Voucher của tôi" },
     { id: "password", label: "Đổi mật khẩu" },
+    { id: "wishlist", label: "Danh sách yêu thích" }, // Added Wishlist tab
   ];
 
   const handleTabClick = (tabId) => {
@@ -87,7 +89,7 @@ const Profile = () => {
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const tab = params.get("tab");
-    if (tab && ["profile", "address", "password", "vouchers"].includes(tab)) {
+    if (tab && ["profile", "address", "password", "vouchers", "wishlist"].includes(tab)) { // Added wishlist to valid tabs
       setActiveTab(tab);
     } else {
       setActiveTab("profile");
@@ -150,7 +152,6 @@ const Profile = () => {
     fetchProvinces();
   }, [provinces]);
 
-  // Fetch addresses
   const fetchAddresses = async () => {
     try {
       const response = await apis.getAllAddresses();
@@ -531,7 +532,7 @@ const Profile = () => {
 
   if (!userInfo) {
     return (
-      <div className="bg-white min-auto">
+      <div className="bg-white min-h-screen">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 text-center text-red-600 font-semibold text-sm sm:text-base">
           Đang tải thông tin người dùng...
         </div>
@@ -540,7 +541,7 @@ const Profile = () => {
   }
 
   return (
-    <div className="bg-white min-auto">
+    <div className="bg-white min-h-screen">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex flex-col md:flex-row gap-6">
         <Sidebar
           activeTab={activeTab}
@@ -612,6 +613,7 @@ const Profile = () => {
             />
           )}
           {activeTab === "vouchers" && <VoucherList />}
+          {activeTab === "wishlist" && <Wishlist />}
         </section>
       </div>
     </div>

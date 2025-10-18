@@ -1,5 +1,11 @@
 import React, { useState, useEffect, useCallback, useContext } from "react";
-import { FaStar, FaPlay, FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import {
+  FaStar,
+  FaPlay,
+  FaChevronLeft,
+  FaChevronRight,
+  FaHeart,
+} from "react-icons/fa";
 import { useParams, useSearchParams } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import ProductDescription from "../../components/ProductDescription/ProductDescription";
@@ -109,8 +115,8 @@ const Product = () => {
   const [reviews, setReviews] = useState([]);
   const [reviewsLoading, setReviewsLoading] = useState(true);
   const [currentReviewPage, setCurrentReviewPage] = useState(1);
+  const [isFavorited, setIsFavorited] = useState(false);
   const REVIEWS_PER_PAGE = 5;
-
   const MAX_VISIBLE_THUMBNAILS = 4;
 
   useEffect(() => {
@@ -219,6 +225,27 @@ const Product = () => {
     }
   }, [selectedItem, setSearchParams]);
 
+  useEffect(() => {
+    const fetchWishlistStatus = async () => {
+      if (!auth.isLoggedIn || !selectedItem?._id) return;
+      try {
+        const response = await apis.apiGetAllWishlists();
+        if (response.success) {
+          const isInWishlist = response.wishlists.some(
+            (wishlist) => wishlist.productItemId._id === selectedItem._id
+          );
+          setIsFavorited(isInWishlist);
+        } else {
+          console.log("Failed to fetch wishlist:", response.msg);
+        }
+      } catch (error) {
+        console.log("Error fetching wishlist status:", error);
+      }
+    };
+
+    fetchWishlistStatus();
+  }, [auth.isLoggedIn, selectedItem?._id]);
+
   const addToCartHandler = useCallback(
     async (productItemId) => {
       if (!auth.isLoggedIn) {
@@ -238,6 +265,43 @@ const Product = () => {
       }
     },
     [auth.isLoggedIn, fetchCart]
+  );
+
+  const toggleWishlistHandler = useCallback(
+    async (productItemId) => {
+      if (!auth.isLoggedIn) {
+        toast.error("Bạn cần đăng nhập để quản lý danh sách yêu thích!");
+        return;
+      }
+      try {
+        if (isFavorited) {
+          const response = await apis.apiRemoveFromWishlist(productItemId);
+          if (response.success) {
+            setIsFavorited(false);
+            toast.success("Đã xóa sản phẩm khỏi danh sách yêu thích!");
+          } else {
+            toast.error(
+              response.msg || "Không thể xóa khỏi danh sách yêu thích."
+            );
+          }
+        } else {
+          const response = await apis.apiAddToWishlist(productItemId);
+          if (response.success) {
+            setIsFavorited(true);
+            toast.success("Sản phẩm đã được thêm vào danh sách yêu thích!");
+          } else {
+            toast.error(
+              response.msg || "Không thể thêm vào danh sách yêu thích."
+            );
+          }
+        }
+      } catch (error) {
+        toast.error(
+          error.msg || "Đã xảy ra lỗi khi cập nhật danh sách yêu thích."
+        );
+      }
+    },
+    [auth.isLoggedIn, isFavorited]
   );
 
   const handlePrevImage = useCallback(() => {
@@ -381,7 +445,7 @@ const Product = () => {
                 attr.code === "Phiên bản" &&
                 attr.value === selectedPrimaryAttribute
             )
-        ) || product?.productItems[0]; // Fallback to first item if not found
+        ) || product?.productItems[0];
 
       if (newItem) {
         setSelectedItem(newItem);
@@ -420,7 +484,7 @@ const Product = () => {
                   (attr) => attr.code === "Màu" && attr.value === selectedColor
                 )
               : true)
-        ) || product?.productItems[0]; // Fallback to first item if not found
+        ) || product?.productItems[0];
 
       if (newItem) {
         setSelectedItem(newItem);
@@ -463,7 +527,7 @@ const Product = () => {
             item.attributes?.some(
               (attr) => attr.code === code && attr.value === value
             )
-        ) || product?.productItems[0]; // Fallback to first item if not found
+        ) || product?.productItems[0];
 
       if (newItem) {
         setSelectedItem(newItem);
@@ -874,12 +938,25 @@ const Product = () => {
               </div>
             </div>
           ))}
-          <button
-            onClick={() => addToCartHandler(selectedItem._id)}
-            className="w-full bg-blue-600 text-white py-2 sm:py-3 md:py-4 rounded-xl font-medium text-sm sm:text-base md:text-lg hover:bg-blue-700 transition-colors"
-          >
-            Thêm vào giỏ hàng
-          </button>
+          <div className="flex gap-2 sm:gap-3 md:gap-4">
+            <button
+              onClick={() => addToCartHandler(selectedItem._id)}
+              className="flex-1 bg-blue-600 text-white py-2 sm:py-3 md:py-4 rounded-xl font-medium text-sm sm:text-base md:text-lg hover:bg-blue-700 transition-colors"
+            >
+              Thêm vào giỏ hàng
+            </button>
+            <button
+              onClick={() => toggleWishlistHandler(selectedItem._id)}
+              className={`flex items-center justify-center w-12 sm:w-14 md:w-16 py-2 sm:py-3 md:py-4 rounded-xl font-medium text-sm sm:text-base md:text-lg transition-colors ${
+                isFavorited
+                  ? "bg-red-500 text-white hover:bg-red-600"
+                  : "bg-gray-200 text-gray-600 hover:bg-gray-300"
+              }`}
+              title={isFavorited ? "Xóa khỏi yêu thích" : "Thêm vào yêu thích"}
+            >
+              <FaHeart className="w-5 sm:w-6 md:w-7 h-5 sm:h-6 md:h-7" />
+            </button>
+          </div>
         </div>
       </div>
       <ProductDescription
