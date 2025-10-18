@@ -14,7 +14,7 @@ const VoucherProduct = () => {
   const [vouchers, setVouchers] = useState([]);
   const [savedVoucherIds, setSavedVoucherIds] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [isDataReady, setIsDataReady] = useState(false); // Thêm trạng thái kiểm tra dữ liệu
+  const [isDataReady, setIsDataReady] = useState(false);
   const [isSaving, setIsSaving] = useState({});
   const [error, setError] = useState(null);
   const { auth, user } = useContext(ShopContext);
@@ -70,7 +70,7 @@ const VoucherProduct = () => {
 
   const handleRetry = async () => {
     await Promise.all([getAllVouchers(), getUserSavedVouchers()]);
-    setIsDataReady(true); // Đánh dấu dữ liệu đã sẵn sàng
+    setIsDataReady(true);
   };
 
   useEffect(() => {
@@ -102,7 +102,8 @@ const VoucherProduct = () => {
     []
   );
 
-  if (!auth.isLoggedIn) {
+  // Hide the entire section if not logged in or no vouchers (and not loading or in error state)
+  if (!auth.isLoggedIn || (filteredVouchers.length === 0 && !isLoading && !error && isDataReady)) {
     return null;
   }
 
@@ -134,12 +135,6 @@ const VoucherProduct = () => {
               Thử lại
             </button>
           </div>
-        </div>
-      ) : filteredVouchers.length === 0 ? (
-        <div className="mt-6 min-h-[200px] flex items-center justify-center">
-          <p className="text-gray-500 text-lg font-medium">
-            Không có voucher nào để lưu.
-          </p>
         </div>
       ) : (
         <Swiper

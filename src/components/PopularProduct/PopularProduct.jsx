@@ -19,7 +19,7 @@ const PopularProducts = () => {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await apis.apiGetPopularProducts({ limit: 5 });
+      const response = await apis.apiGetPopularProducts({ limit: 10 });
       if (!response?.productItemList || !Array.isArray(response.productItemList)) {
         throw new Error("Dữ liệu sản phẩm không hợp lệ.");
       }
@@ -43,6 +43,11 @@ const PopularProducts = () => {
     768: { slidesPerView: 4, spaceBetween: 24 },
     1024: { slidesPerView: 5, spaceBetween: 30 },
   };
+
+  // Hide the entire section if no products are available (and not loading or in error state)
+  if (popularProducts.length === 0 && !isLoading && !error) {
+    return null;
+  }
 
   return (
     <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
@@ -72,12 +77,6 @@ const PopularProducts = () => {
               Thử lại
             </button>
           </div>
-        </div>
-      ) : popularProducts.length === 0 ? (
-        <div className="mt-6 min-h-[200px] flex items-center justify-center">
-          <p className="text-gray-500 text-lg font-medium">
-            Không có sản phẩm phổ biến nào.
-          </p>
         </div>
       ) : (
         <Swiper

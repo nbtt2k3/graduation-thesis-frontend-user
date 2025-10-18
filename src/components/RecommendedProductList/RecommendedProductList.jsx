@@ -9,13 +9,13 @@ import Title from "../Title/Title";
 import Item from "../Item/Item";
 import * as apis from "../../apis";
 import { toast } from "react-hot-toast";
-import { ShopContext } from "../../Context/ShopContext"; // Import ShopContext
+import { ShopContext } from "../../Context/ShopContext";
 
 const RecommendedProductList = () => {
   const [products, setProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
-  
+
   // Access auth from ShopContext
   const { auth } = useContext(ShopContext);
   const isLoggedIn = auth.isLoggedIn;
@@ -40,10 +40,8 @@ const RecommendedProductList = () => {
   useEffect(() => {
     if (isLoggedIn) {
       fetchRecommendations();
-    } else {
-      setError("Vui lòng đăng nhập để xem sản phẩm đề xuất.");
     }
-  }, [isLoggedIn]); // Re-run if isLoggedIn changes
+  }, [isLoggedIn]);
 
   const uniqueProducts = useMemo(() => {
     const seen = new Set();
@@ -68,6 +66,11 @@ const RecommendedProductList = () => {
     }),
     []
   );
+
+  // Hide the entire section if not logged in or no products (and not loading or in error state)
+  if (!isLoggedIn || (uniqueProducts.length === 0 && !isLoading && !error)) {
+    return null;
+  }
 
   return (
     <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
@@ -99,14 +102,6 @@ const RecommendedProductList = () => {
               </button>
             )}
           </div>
-        </div>
-      ) : uniqueProducts.length === 0 ? (
-        <div className="mt-6 min-h-[200px] flex items-center justify-center">
-          <p className="text-gray-500 text-lg font-medium">
-            {isLoggedIn
-              ? "Không có sản phẩm đề xuất nào."
-              : "Vui lòng đăng nhập để xem sản phẩm đề xuất."}
-          </p>
         </div>
       ) : (
         <Swiper
