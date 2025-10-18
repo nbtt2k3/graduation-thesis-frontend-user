@@ -75,8 +75,22 @@ const Header = () => {
               </div>
             ) : auth?.isLoggedIn && current ? (
               <div className="flex items-center gap-2 sm:gap-3 cursor-pointer">
-                <div className="w-7 h-7 sm:w-8 sm:h-8 md:w-9 md:h-9 rounded-full bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center text-white font-semibold text-xs sm:text-sm">
-                  {current?.fullName?.charAt(0)?.toUpperCase() || "?"}
+                <div className="w-7 h-7 sm:w-8 sm:h-8 md:w-9 md:h-9 rounded-full overflow-hidden flex items-center justify-center">
+                  {current?.avatarUrl ? (
+                    <img
+                      src={current.avatarUrl}
+                      alt="Avatar"
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        e.target.style.display = "none"; // Hide broken image
+                        e.target.nextSibling.style.display = "flex"; // Show fallback
+                      }}
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center text-white font-semibold text-xs sm:text-sm">
+                      {current?.fullName?.charAt(0)?.toUpperCase() || "?"}
+                    </div>
+                  )}
                 </div>
                 <div className="hidden md:block text-left">
                   <div className="text-xs text-gray-500">Xin chào</div>
