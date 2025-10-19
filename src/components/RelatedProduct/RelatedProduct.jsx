@@ -30,11 +30,7 @@ const RelatedProduct = ({ productItemId }) => {
     setError(null);
 
     try {
-      // First, try apiGetSimilarItems
       const responseSimilar = await apiGetSimilarItems(productItemId);
-      console.log("Similar Items Response:", responseSimilar);
-
-      // Check if apiGetSimilarItems returns 10 valid products
       if (
         responseSimilar?.success &&
         responseSimilar?.data?.success &&
@@ -42,12 +38,7 @@ const RelatedProduct = ({ productItemId }) => {
         responseSimilar.data.recommendedProductList.length === 10
       ) {
         setProductItems(responseSimilar.data.recommendedProductList);
-        console.log(
-          "Số sản phẩm từ apiGetSimilarItems:",
-          responseSimilar.data.recommendedProductList.length
-        );
       } else {
-        // Fallback to apiGetRelatedProductItems if apiGetSimilarItems doesn't return 10 products
         const responseRelated = await apiGetRelatedProductItems(productItemId, {
           limit: 10,
         });
@@ -61,10 +52,6 @@ const RelatedProduct = ({ productItemId }) => {
           );
         }
         setProductItems(responseRelated.productItemList);
-        console.log(
-          "Số sản phẩm từ apiGetRelatedProductItems:",
-          responseRelated.productItemList.length
-        );
       }
     } catch (error) {
       setError(

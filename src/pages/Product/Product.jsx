@@ -120,6 +120,11 @@ const Product = () => {
   const REVIEWS_PER_PAGE = 5;
   const MAX_VISIBLE_THUMBNAILS = 4;
 
+  // Scroll to top when component mounts
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [productId]);
+
   useEffect(() => {
     if (!productId) {
       setError("Không tìm thấy ID sản phẩm");
