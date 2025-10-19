@@ -855,9 +855,6 @@ const Product = () => {
               {renderStars(selectedItem.ratingAvg || 0)}
             </div>
             <span className="text-xs sm:text-sm md:text-base text-gray-600">
-              ({selectedItem.reviewCount || 0} đánh giá)
-            </span>
-            <span className="text-xs sm:text-sm md:text-base text-gray-600">
               Mã sản phẩm: {selectedItem.sku || "N/A"}
             </span>
           </div>
