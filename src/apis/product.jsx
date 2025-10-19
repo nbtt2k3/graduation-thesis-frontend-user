@@ -39,3 +39,9 @@ export const apiGetRelatedProductItems = (productItemId) =>
     url: `/product/relatedProducts/${productItemId}`,
     method: "get",
   });
+
+export const apiGetSimilarItems = (productId) =>
+  axios({
+    url: `/product/similar-items/${productId}`,
+    method: "post",
+  });

@@ -8,7 +8,10 @@ import "swiper/css/navigation";
 import { Autoplay, Navigation } from "swiper/modules";
 import Title from "../Title/Title";
 import Item from "../Item/Item";
-import { apiGetRelatedProductItems } from "../../apis/product";
+import {
+  apiGetRelatedProductItems,
+  apiGetSimilarItems,
+} from "../../apis/product";
 import { toast } from "react-hot-toast";
 
 const RelatedProduct = ({ productItemId }) => {
@@ -27,19 +30,49 @@ const RelatedProduct = ({ productItemId }) => {
     setError(null);
 
     try {
-      const response = await apiGetRelatedProductItems(productItemId, { limit: 10 });
+      // First, try apiGetSimilarItems
+      const responseSimilar = await apiGetSimilarItems(productItemId);
+      console.log("Similar Items Response:", responseSimilar);
+
+      // Check if apiGetSimilarItems returns 10 valid products
       if (
-        !response?.success ||
-        !response.productItemList ||
-        !Array.isArray(response.productItemList)
+        responseSimilar?.success &&
+        responseSimilar?.data?.success &&
+        Array.isArray(responseSimilar?.data?.recommendedProductList) &&
+        responseSimilar.data.recommendedProductList.length === 10
       ) {
-        throw new Error(response?.msg || "Dữ liệu sản phẩm không hợp lệ.");
+        setProductItems(responseSimilar.data.recommendedProductList);
+        console.log(
+          "Số sản phẩm từ apiGetSimilarItems:",
+          responseSimilar.data.recommendedProductList.length
+        );
+      } else {
+        // Fallback to apiGetRelatedProductItems if apiGetSimilarItems doesn't return 10 products
+        const responseRelated = await apiGetRelatedProductItems(productItemId, {
+          limit: 10,
+        });
+        if (
+          !responseRelated?.success ||
+          !responseRelated.productItemList ||
+          !Array.isArray(responseRelated.productItemList)
+        ) {
+          throw new Error(
+            responseRelated?.msg || "Dữ liệu sản phẩm không hợp lệ."
+          );
+        }
+        setProductItems(responseRelated.productItemList);
+        console.log(
+          "Số sản phẩm từ apiGetRelatedProductItems:",
+          responseRelated.productItemList.length
+        );
       }
-      setProductItems(response.productItemList);
-      console.log("Số sản phẩm trả về:", response.productItemList.length); // Debug
     } catch (error) {
-      setError(error?.msg || "Không thể tải sản phẩm liên quan. Vui lòng thử lại sau.");
-      toast.error(error?.msg || "Không thể tải sản phẩm liên quan. Vui lòng thử lại sau.");
+      setError(
+        error?.msg || "Không thể tải sản phẩm liên quan. Vui lòng thử lại sau."
+      );
+      toast.error(
+        error?.msg || "Không thể tải sản phẩm liên quan. Vui lòng thử lại sau."
+      );
     } finally {
       setIsLoading(false);
     }
