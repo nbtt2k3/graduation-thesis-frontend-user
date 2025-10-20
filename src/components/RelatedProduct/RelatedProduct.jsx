@@ -19,6 +19,7 @@ const RelatedProduct = ({ productItemId }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  // 🔍 Lấy danh sách sản phẩm tương tự hoặc liên quan
   const fetchRelatedProductItems = async () => {
     if (!productItemId) {
       setProductItems([]);
@@ -30,27 +31,35 @@ const RelatedProduct = ({ productItemId }) => {
     setError(null);
 
     try {
+      // Ưu tiên lấy từ mô hình MF (Python API)
       const responseSimilar = await apiGetSimilarItems(productItemId);
+
       if (
         responseSimilar?.success &&
         responseSimilar?.data?.success &&
         Array.isArray(responseSimilar?.data?.recommendedProductList) &&
-        responseSimilar.data.recommendedProductList.length === 10
+        responseSimilar.data.recommendedProductList.length > 0
       ) {
-        setProductItems(responseSimilar.data.recommendedProductList);
+        // ✅ Sắp xếp theo similarity_score giảm dần
+        const sortedList = [...responseSimilar.data.recommendedProductList].sort(
+          (a, b) => (b.similarity_score || 0) - (a.similarity_score || 0)
+        );
+        setProductItems(sortedList);
       } else {
+        // 🔁 Fallback sang API sản phẩm liên quan
         const responseRelated = await apiGetRelatedProductItems(productItemId, {
           limit: 10,
         });
+
         if (
           !responseRelated?.success ||
-          !responseRelated.productItemList ||
           !Array.isArray(responseRelated.productItemList)
         ) {
           throw new Error(
             responseRelated?.msg || "Dữ liệu sản phẩm không hợp lệ."
           );
         }
+
         setProductItems(responseRelated.productItemList);
       }
     } catch (error) {
@@ -65,10 +74,12 @@ const RelatedProduct = ({ productItemId }) => {
     }
   };
 
+  // Gọi API khi thay đổi productItemId
   useEffect(() => {
     fetchRelatedProductItems();
   }, [productItemId]);
 
+  // 🔧 Lọc trùng & bỏ sản phẩm gốc, giữ thứ tự theo similarity_score
   const uniqueProductItems = useMemo(() => {
     const seen = new Set();
     return productItems
@@ -78,7 +89,6 @@ const RelatedProduct = ({ productItemId }) => {
         seen.add(key);
         return true;
       })
-      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
       .slice(0, 10);
   }, [productItems, productItemId]);
 

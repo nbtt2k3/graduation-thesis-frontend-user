@@ -16,19 +16,33 @@ const RecommendedProductList = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Access auth from ShopContext
+  // Lấy trạng thái đăng nhập từ context
   const { auth } = useContext(ShopContext);
   const isLoggedIn = auth.isLoggedIn;
 
+  // 🔹 Hàm gọi API gợi ý sản phẩm
   const fetchRecommendations = async () => {
     setIsLoading(true);
     setError(null);
     try {
       const response = await apis.apiGetRecommendationsForNewUserService();
-      if (!response?.data?.recommendedProductList || !Array.isArray(response.data.recommendedProductList)) {
+
+      if (
+        !response?.data?.recommendedProductList ||
+        !Array.isArray(response.data.recommendedProductList)
+      ) {
         throw new Error("Dữ liệu sản phẩm đề xuất không hợp lệ.");
       }
+
+      // ✅ Gán trực tiếp danh sách gợi ý (đã sắp theo predicted_rating từ backend)
       setProducts(response.data.recommendedProductList);
+
+      // ✅ Log thứ tự để kiểm tra
+      console.log("🔍 Danh sách sản phẩm từ backend (đã sắp theo predicted_rating):");
+      response.data.recommendedProductList.forEach((p, i) => {
+        console.log(`#${i + 1}. ${p.name || "Không tên"} (${p.predicted_rating || "?"})`);
+      });
+
     } catch (error) {
       setError(error?.msg || "Không thể tải sản phẩm đề xuất. Vui lòng thử lại sau.");
       toast.error(error?.msg || "Không thể tải sản phẩm đề xuất. Vui lòng thử lại sau.");
@@ -37,23 +51,22 @@ const RecommendedProductList = () => {
     }
   };
 
+  // 🔸 Gọi API khi người dùng đăng nhập
   useEffect(() => {
     if (isLoggedIn) {
       fetchRecommendations();
     }
   }, [isLoggedIn]);
 
+  // 🔹 Lọc trùng, giữ nguyên thứ tự backend
   const uniqueProducts = useMemo(() => {
     const seen = new Set();
-    return products
-      .filter((p) => {
-        const key = p._id;
-        if (seen.has(key)) return false;
-        seen.add(key);
-        return true;
-      })
-      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-      .slice(0, 10);
+    return products.filter((p) => {
+      const key = p._id;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
   }, [products]);
 
   const swiperBreakpoints = useMemo(
@@ -67,7 +80,7 @@ const RecommendedProductList = () => {
     []
   );
 
-  // Hide the entire section if not logged in or no products (and not loading or in error state)
+  // Ẩn toàn bộ nếu chưa đăng nhập hoặc không có sản phẩm
   if (!isLoggedIn || (uniqueProducts.length === 0 && !isLoading && !error)) {
     return null;
   }
@@ -114,8 +127,8 @@ const RecommendedProductList = () => {
           modules={[Autoplay, Navigation]}
           className="mt-6 min-h-[200px] md:min-h-[250px] lg:min-h-[300px] w-full"
         >
-          {uniqueProducts.map((productItem) => (
-            <SwiperSlide key={productItem._id} className="py-2">
+          {uniqueProducts.map((productItem, index) => (
+            <SwiperSlide key={productItem._id || index} className="py-2">
               <div className="w-full max-w-[260px] mx-auto">
                 <Item productItem={productItem} />
               </div>
