@@ -1042,13 +1042,13 @@ const VoucherSection = ({
   return (
     <div className="mt-6">
       <Title
-        title1={"Khuyến mãi"}
-        title2={"& Coupon"}
+        title1={"Áp dụng"}
+        title2={"khuyến mãi"}
         title1Styles={"text-xl font-bold"}
       />
       <div className="flex flex-col gap-4 mt-3">
         <div className="flex flex-col gap-2">
-          <h4 className="text-sm font-medium">Voucher giảm giá sản phẩm</h4>
+          <h4 className="text-sm font-medium">Phiếu giảm giá sản phẩm</h4>
           <select
             value={selectedProductVoucher?._id || ""}
             onChange={(e) => {
@@ -1091,7 +1091,7 @@ const VoucherSection = ({
           )}
         </div>
         <div className="flex flex-col gap-2">
-          <h4 className="text-sm font-medium">Voucher miễn phí vận chuyển</h4>
+          <h4 className="text-sm font-medium">Phiếu miễn phí vận chuyển</h4>
           <select
             value={selectedFreeShipVoucher?._id || ""}
             onChange={(e) => {
@@ -1123,7 +1123,7 @@ const VoucherSection = ({
           )}
         </div>
         <div className="flex flex-col gap-2">
-          <h4 className="text-sm font-medium">Mã coupon</h4>
+          <h4 className="text-sm font-medium">Mã giảm giá</h4>
           <div className="flex gap-2">
             <input
               value={couponCode}

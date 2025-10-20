@@ -19,7 +19,7 @@ const Sidebar = ({ activeTab, setActiveTab, className }) => {
     { id: "address", label: "Địa chỉ" },
     { id: "vouchers", label: "Voucher của tôi" },
     { id: "password", label: "Đổi mật khẩu" },
-    { id: "wishlist", label: "Danh sách yêu thích" }, // Added Wishlist tab
+    { id: "wishlist", label: "Danh sách yêu thích" },
   ];
 
   const handleTabClick = (tabId) => {

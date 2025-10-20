@@ -75,8 +75,8 @@ const RecommendedProductList = () => {
   return (
     <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
       <Title
-        title1="Sản phẩm"
-        title2="đề xuất"
+        title1="Có thể bạn"
+        title2="sẽ thích"
         titleStyles="pb-8 text-center text-2xl sm:text-3xl font-semibold text-gray-800"
         paraStyles="max-w-xl mx-auto text-gray-600 text-sm sm:text-base"
       />

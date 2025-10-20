@@ -20,25 +20,46 @@ import {
 import { toast } from "react-hot-toast";
 
 const statusConfig = {
-  pending: { label: "Chờ xác nhận", color: "bg-blue-100 text-blue-800 border border-blue-200" },
-  confirmed: { label: "Đã xác nhận", color: "bg-teal-100 text-teal-800 border border-teal-200" },
+  pending: {
+    label: "Chờ xác nhận",
+    color: "bg-blue-100 text-blue-800 border border-blue-200",
+  },
+  confirmed: {
+    label: "Đã xác nhận",
+    color: "bg-teal-100 text-teal-800 border border-teal-200",
+  },
   processing: {
     label: "Đang chuẩn bị",
     color: "bg-yellow-100 text-yellow-800 border border-yellow-200",
   },
-  shipped: { label: "Đã gửi đi", color: "bg-cyan-100 text-cyan-800 border border-cyan-200" },
+  shipped: {
+    label: "Đã gửi đi",
+    color: "bg-cyan-100 text-cyan-800 border border-cyan-200",
+  },
   out_for_delivery: {
     label: "Đang giao hàng",
     color: "bg-orange-100 text-orange-800 border border-orange-200",
   },
-  delivered: { label: "Đã giao", color: "bg-green-100 text-green-800 border border-green-200" },
+  delivered: {
+    label: "Đã giao",
+    color: "bg-green-100 text-green-800 border border-green-200",
+  },
   return_requested: {
     label: "Yêu cầu trả hàng",
     color: "bg-purple-100 text-purple-800 border border-purple-200",
   },
-  returned: { label: "Đã trả hàng", color: "bg-purple-200 text-purple-900 border border-purple-300" },
-  cancelled: { label: "Đã hủy", color: "bg-red-100 text-red-800 border border-red-200" },
-  default: { label: "Không xác định", color: "bg-gray-100 text-gray-800 border border-gray-200" },
+  returned: {
+    label: "Đã trả hàng",
+    color: "bg-purple-200 text-purple-900 border border-purple-300",
+  },
+  cancelled: {
+    label: "Đã hủy",
+    color: "bg-red-100 text-red-800 border border-red-200",
+  },
+  default: {
+    label: "Không xác định",
+    color: "bg-gray-100 text-gray-800 border border-gray-200",
+  },
 };
 
 const getStatusLabel = (status) =>
@@ -78,10 +99,11 @@ const OrderDetails = () => {
           setOrder({
             ...response.order,
             status: response.order.status?.toLowerCase() || "unknown",
-            items: response.order.items?.map((item) => ({
-              ...item,
-              hasReview: item.hasReview || false, // Add hasReview at product level
-            })) || [],
+            items:
+              response.order.items?.map((item) => ({
+                ...item,
+                hasReview: item.hasReview || false, // Add hasReview at product level
+              })) || [],
             voucherInfos: response.order.voucherInfos || [],
             couponInfos: response.order.couponInfos || [],
             shippingAddress: response.order.shippingAddress || {},
@@ -210,7 +232,9 @@ const OrderDetails = () => {
       <div className="bg-white min-h-screen">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mx-auto"></div>
-          <p className="mt-4 text-gray-600 font-semibold">Đang tải dữ liệu...</p>
+          <p className="mt-4 text-gray-600 font-semibold">
+            Đang tải dữ liệu...
+          </p>
         </div>
       </div>
     );
@@ -268,9 +292,11 @@ const OrderDetails = () => {
 
   // Calculate discounts from voucherInfos and couponInfos
   const voucherDiscount =
-    order.voucherInfos?.reduce((sum, v) => sum + (v.discountAmount || 0), 0) || 0;
+    order.voucherInfos?.reduce((sum, v) => sum + (v.discountAmount || 0), 0) ||
+    0;
   const couponDiscount =
-    order.couponInfos?.reduce((sum, c) => sum + (c.discountAmount || 0), 0) || 0;
+    order.couponInfos?.reduce((sum, c) => sum + (c.discountAmount || 0), 0) ||
+    0;
   const totalDiscount = voucherDiscount + couponDiscount;
 
   return (
@@ -397,7 +423,8 @@ const OrderDetails = () => {
           </div>
           {isCancelled && (
             <p className="mt-4 text-sm text-red-600">
-              Đơn hàng đã bị hủy. Lý do: {order.cancelReason || "Không xác định"}
+              Đơn hàng đã bị hủy. Lý do:{" "}
+              {order.cancelReason || "Không xác định"}
             </p>
           )}
           {isReturn && (
@@ -421,7 +448,8 @@ const OrderDetails = () => {
           {order.cancelReason && (
             <p className="mb-4 text-sm text-gray-700">
               <strong className="font-semibold">
-                {currentStatus === "cancelled" ? "Lý do hủy" : "Lý do trả hàng"}:
+                {currentStatus === "cancelled" ? "Lý do hủy" : "Lý do trả hàng"}
+                :
               </strong>{" "}
               {order.cancelReason}
             </p>
@@ -434,7 +462,10 @@ const OrderDetails = () => {
                 className="flex gap-4 border border-gray-200 rounded-lg p-4 shadow-sm"
               >
                 <img
-                  src={product.image || "https://via.placeholder.com/80x80?text=Img"}
+                  src={
+                    product.image ||
+                    "https://via.placeholder.com/80x80?text=Img"
+                  }
                   alt={product.name || "Sản phẩm"}
                   className="w-20 h-20 object-cover rounded"
                 />
@@ -498,12 +529,16 @@ const OrderDetails = () => {
           {totalDiscount > 0 && (
             <div className="flex justify-between py-1">
               <span>Giảm giá (Voucher/Coupon)</span>
-              <span className="text-red-500">-{formatCurrency(totalDiscount)}</span>
+              <span className="text-red-500">
+                -{formatCurrency(totalDiscount)}
+              </span>
             </div>
           )}
           <div className="flex justify-between border-t pt-3 mt-3 text-lg font-semibold">
             <span>Thành tiền</span>
-            <span className="text-red-600">{formatCurrency(order.totalAmount)}</span>
+            <span className="text-red-600">
+              {formatCurrency(order.totalAmount)}
+            </span>
           </div>
           <div className="flex justify-between pt-2 text-sm text-gray-600">
             <span>Phương thức Thanh toán</span>
@@ -518,7 +553,11 @@ const OrderDetails = () => {
             <span className="text-right font-medium text-gray-800">
               {order.paymentStatus === "pending"
                 ? "Chưa thanh toán"
-                : order.paymentStatus || "Không xác định"}
+                : order.paymentStatus === "completed"
+                  ? "Đã thanh toán"
+                  : order.paymentStatus === "failed"
+                    ? "Thất bại"
+                    : "Không xác định"}
             </span>
           </div>
         </div>
