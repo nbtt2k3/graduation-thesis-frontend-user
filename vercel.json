@@ -1,5 +1,12 @@
 {
   "rewrites": [
-    { "source": "/(.*)", "destination": "/" }
+    {
+      "source": "/api/(.*)",
+      "destination": "https://graduation-thesis-server-production.up.railway.app"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/"
+    }
   ]
 }
