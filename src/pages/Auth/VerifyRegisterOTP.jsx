@@ -7,11 +7,11 @@ import loginImg from "../../assets/login.png";
 
 const VerifyRegisterOTP = () => {
   const { navigate } = useContext(ShopContext);
+  const [email, setEmail] = useState("");
   const {
     register,
     handleSubmit,
     formState: { errors },
-    reset,
   } = useForm({
     defaultValues: {
       otp: "",
@@ -21,15 +21,28 @@ const VerifyRegisterOTP = () => {
   const [isResending, setIsResending] = useState(false);
 
   useEffect(() => {
-    document.getElementById("otp")?.focus();
-    reset({ otp: "" });
-  }, [reset]);
+    const storedEmail = sessionStorage.getItem("email");
+    if (storedEmail) {
+      setEmail(storedEmail);
+      document.getElementById("otp")?.focus();
+    } else {
+      toast.error("Không tìm thấy phiên xác thực.");
+      navigate("/register");
+    }
+  }, [navigate]);
 
   const onSubmitHandler = async (data) => {
+    if (!email) return;
+
     setIsSubmitting(true);
     try {
-      const response = await apis.apiVerifyRegisterOTP(data);
+      const response = await apis.apiVerifyRegisterOTP({
+        email,
+        otp: data.otp,
+      });
+
       if (response.success) {
+        sessionStorage.removeItem("email");
         toast.success(response.msg || "Xác minh OTP thành công");
         navigate("/login");
       }
@@ -46,9 +59,11 @@ const VerifyRegisterOTP = () => {
   };
 
   const handleResendOTP = async () => {
+    if (!email) return;
+
     setIsResending(true);
     try {
-      const response = await apis.apiResendRegisterOTP();
+      const response = await apis.apiResendRegisterOTP({ email });
       if (response.success) {
         toast.success(response.msg || "Đã gửi lại mã OTP");
       }
@@ -64,6 +79,7 @@ const VerifyRegisterOTP = () => {
   };
 
   const handleBackToRegister = () => {
+    sessionStorage.removeItem("email");
     navigate("/register");
   };
 

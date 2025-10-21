@@ -7,11 +7,11 @@ import loginImg from "../../assets/login.png";
 
 const VerifyForgotPasswordOtp = () => {
   const { navigate } = useContext(ShopContext);
+  const [email, setEmail] = useState("");
   const {
     register,
     handleSubmit,
     formState: { errors },
-    reset,
   } = useForm({
     defaultValues: {
       otp: "",
@@ -21,15 +21,25 @@ const VerifyForgotPasswordOtp = () => {
   const [isResending, setIsResending] = useState(false);
 
   useEffect(() => {
-    // Auto-focus OTP input and clear form
-    document.getElementById("otp")?.focus();
-    reset({ otp: "" });
-  }, [reset]);
+    const storedEmail = sessionStorage.getItem("email");
+    if (storedEmail) {
+      setEmail(storedEmail);
+      document.getElementById("otp")?.focus();
+    } else {
+      toast.error("Không tìm thấy phiên xác thực.");
+      navigate("/register");
+    }
+  }, [navigate]);
 
   const onSubmitHandler = async (data) => {
+    if (!email) return;
+
     setIsSubmitting(true);
     try {
-      const response = await apis.apiVerifyResetPasswordOTP(data);
+      const response = await apis.apiVerifyResetPasswordOTP({
+        email,
+        otp: data.otp,
+      });
       if (response.success) {
         toast.success(response.msg || "Xác minh OTP thành công");
         navigate("/reset-password");
@@ -48,7 +58,7 @@ const VerifyForgotPasswordOtp = () => {
   const handleResendOTP = async () => {
     setIsResending(true);
     try {
-      const response = await apis.apiResendForgotPasswordOTP();
+      const response = await apis.apiResendForgotPasswordOTP({ email });
       if (response.success) {
         toast.success(response.msg || "Đã gửi lại mã OTP");
       }
@@ -115,7 +125,10 @@ const VerifyForgotPasswordOtp = () => {
               disabled={isSubmitting || isResending}
             />
             {errors.otp && (
-              <p id="otp-error" className="text-red-500 mt-1 text-xs sm:text-sm">
+              <p
+                id="otp-error"
+                className="text-red-500 mt-1 text-xs sm:text-sm"
+              >
                 {errors.otp.message}
               </p>
             )}

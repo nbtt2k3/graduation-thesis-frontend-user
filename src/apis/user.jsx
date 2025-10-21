@@ -61,16 +61,18 @@ export const apiLogoutUser = () =>
     method: "post",
   });
 
-export const apiResendRegisterOTP = () =>
+export const apiResendRegisterOTP = (data) =>
   axios({
     url: `/user/resendRegisterOtp`,
     method: "post",
+    data,
   });
 
-export const apiResendForgotPasswordOTP = () =>
+export const apiResendForgotPasswordOTP = (data) =>
   axios({
     url: `/user/resendResetPasswordOtp`,
     method: "post",
+    data,
   });
 
 export const apiChangePassword = (data) =>

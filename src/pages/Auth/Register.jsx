@@ -47,6 +47,7 @@ const Register = () => {
     try {
       const response = await apis.apiRegisterUser(data);
       if (response.success) {
+        sessionStorage.setItem("email", data.email);
         toast.success(response.msg);
         navigate("/verify-register-otp");
       }

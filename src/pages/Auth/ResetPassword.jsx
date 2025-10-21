@@ -9,6 +9,7 @@ import loginImg from "../../assets/login.png";
 
 const ResetPassword = () => {
   const { navigate } = useContext(ShopContext);
+  const [email, setEmail] = useState("");
   const {
     register,
     handleSubmit,
@@ -28,15 +29,22 @@ const ResetPassword = () => {
   const password = watch("password");
 
   useEffect(() => {
-    document.getElementById("password")?.focus();
+    const storedEmail = sessionStorage.getItem("email");
+    if (storedEmail) {
+      setEmail(storedEmail);
+      document.getElementById("password")?.focus();
+    } else {
+      toast.error("Không tìm thấy phiên xác thực.");
+      navigate("/register");
+    }
     reset({ password: "", confirmPassword: "" });
-  }, [reset]);
+  }, [reset, navigate]);
 
   const onSubmitHandler = async (data) => {
     setIsSubmitting(true);
     try {
       const { password } = data;
-      const response = await apis.apiResetPassword({ password });
+      const response = await apis.apiResetPassword({ email, password });
       if (response.success) {
         toast.success(response.msg || "Đặt lại mật khẩu thành công");
         navigate("/login");
@@ -106,8 +114,7 @@ const ResetPassword = () => {
                   pattern: {
                     value:
                       /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{6,}$/,
-                    message:
-                      "Mật khẩu phải chứa chữ cái, số và ký tự đặc biệt",
+                    message: "Mật khẩu phải chứa chữ cái, số và ký tự đặc biệt",
                   },
                 })}
                 type={showPassword ? "text" : "password"}
@@ -135,7 +142,10 @@ const ResetPassword = () => {
               </button>
             </div>
             {errors.password && (
-              <p id="password-error" className="text-red-500 mt-1 text-xs sm:text-sm">
+              <p
+                id="password-error"
+                className="text-red-500 mt-1 text-xs sm:text-sm"
+              >
                 {errors.password.message}
               </p>
             )}

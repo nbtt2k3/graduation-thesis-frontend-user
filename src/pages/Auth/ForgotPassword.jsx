@@ -30,6 +30,7 @@ const ForgotPassword = () => {
     try {
       const response = await apis.apiForgotPassword(data);
       if (response.success) {
+        sessionStorage.setItem("email", data.email);
         toast.success(response.msg);
         navigate("/verify-forgot-password-otp");
       }
@@ -92,7 +93,10 @@ const ForgotPassword = () => {
               disabled={isSubmitting}
             />
             {errors.email && (
-              <p id="email-error" className="text-red-500 mt-1 text-xs sm:text-sm">
+              <p
+                id="email-error"
+                className="text-red-500 mt-1 text-xs sm:text-sm"
+              >
                 {errors.email.message}
               </p>
             )}
