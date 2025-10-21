@@ -197,7 +197,6 @@ const AddressSection = ({
             )}&addressdetails=1&limit=5&countrycodes=vn`,
             {
               headers: {
-                "User-Agent": "ECommerceApp/1.0 (contact@yourapp.com)",
                 "Accept-Language": "vi",
               },
             }
