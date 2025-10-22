@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import ProfileForm from "./ProfileForm";
@@ -10,15 +10,17 @@ import VoucherList from "./VoucherList";
 import Wishlist from "./Wishlist";
 import * as apis from "../../apis";
 import { isValidVietnamCoordinates } from "./utils";
+import { ShopContext } from "../../Context/ShopContext";
 
 const Sidebar = ({ activeTab, setActiveTab, className }) => {
   const navigate = useNavigate();
+  const { current } = useContext(ShopContext);
 
   const tabs = [
     { id: "profile", label: "Thông tin cá nhân" },
     { id: "address", label: "Địa chỉ" },
     { id: "vouchers", label: "Voucher của tôi" },
-    { id: "password", label: "Đổi mật khẩu" },
+    ...(current?.googleId ? [] : [{ id: "password", label: "Đổi mật khẩu" }]),
     { id: "wishlist", label: "Danh sách yêu thích" },
   ];
 
@@ -52,6 +54,7 @@ const Sidebar = ({ activeTab, setActiveTab, className }) => {
 const Profile = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { current } = useContext(ShopContext);
   const [userInfo, setUserInfo] = useState(null);
   const [activeTab, setActiveTab] = useState(() => {
     const params = new URLSearchParams(location.search);
@@ -87,15 +90,20 @@ const Profile = () => {
   const [wards, setWards] = useState([]);
 
   useEffect(() => {
+    // Define valid tabs based on current.googleId
+    const validTabs = current?.googleId
+      ? ["profile", "address", "vouchers", "wishlist"]
+      : ["profile", "address", "password", "vouchers", "wishlist"];
+
     const params = new URLSearchParams(location.search);
     const tab = params.get("tab");
-    if (tab && ["profile", "address", "password", "vouchers", "wishlist"].includes(tab)) { // Added wishlist to valid tabs
+    if (tab && validTabs.includes(tab)) {
       setActiveTab(tab);
     } else {
       setActiveTab("profile");
       navigate("/profile?tab=profile");
     }
-  }, [location.search, navigate]);
+  }, [location.search, navigate, current]);
 
   useEffect(() => {
     const fetchUserInfo = async () => {
@@ -283,9 +291,7 @@ const Profile = () => {
 
   const handleSaveAddress = async (data, coords) => {
     if (!data || !coords || !isValidVietnamCoordinates(coords)) {
-      toast.error(
-        "Tọa độ hoặc dữ liệu không hợp lệ. Vui lòng kiểm tra lại."
-      );
+      toast.error("Tọa độ hoặc dữ liệu không hợp lệ. Vui lòng kiểm tra lại.");
       return;
     }
     const provinceName =
@@ -398,9 +404,7 @@ const Profile = () => {
 
   const handleSaveUpdateAddress = async (data, coords) => {
     if (!data || !coords || !isValidVietnamCoordinates(coords)) {
-      toast.error(
-        "Tọa độ hoặc dữ liệu không hợp lệ. Vui lòng kiểm tra lại."
-      );
+      toast.error("Tọa độ hoặc dữ liệu không hợp lệ. Vui lòng kiểm tra lại.");
       return;
     }
     const provinceName =
