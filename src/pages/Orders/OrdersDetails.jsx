@@ -95,6 +95,8 @@ const OrderDetails = () => {
       setIsLoading(true);
       try {
         const response = await apiGetOrder({ orderId });
+
+        console.log("📦 API trả về:", response);
         if (response.success && response.order) {
           setOrder({
             ...response.order,
@@ -102,7 +104,7 @@ const OrderDetails = () => {
             items:
               response.order.items?.map((item) => ({
                 ...item,
-                hasReview: item.hasReview || false, // Add hasReview at product level
+                hasReview: item.hasReview || false,
               })) || [],
             voucherInfos: response.order.voucherInfos || [],
             couponInfos: response.order.couponInfos || [],
@@ -230,9 +232,9 @@ const OrderDetails = () => {
   if (isLoading) {
     return (
       <div className="bg-white min-h-screen">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mx-auto"></div>
-          <p className="mt-4 text-gray-600 font-semibold">
+        <div className="max-w-7xl mx-auto px-2 sm:px-4 md:px-6 lg:px-8 py-6 sm:py-10 text-center">
+          <div className="animate-spin rounded-full h-8 w-8 sm:h-10 sm:w-10 md:h-12 md:w-12 border-t-2 border-b-2 border-blue-500 mx-auto"></div>
+          <p className="mt-2 sm:mt-4 text-xs sm:text-sm md:text-base text-gray-600 font-semibold">
             Đang tải dữ liệu...
           </p>
         </div>
@@ -243,11 +245,11 @@ const OrderDetails = () => {
   if (error || !order) {
     return (
       <div className="bg-white min-h-screen">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 text-center text-red-600 font-semibold">
+        <div className="max-w-7xl mx-auto px-2 sm:px-4 md:px-6 lg:px-8 py-6 sm:py-10 text-center text-red-600 font-semibold">
           {error || "Không tìm thấy đơn hàng."}
           <br />
           <button
-            className="mt-4 px-4 py-2 text-sm font-medium bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
+            className="mt-4 px-3 sm:px-4 py-1 sm:py-2 text-xs sm:text-sm md:text-base font-medium bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
             onClick={() => navigate("/orders")}
             aria-label="Quay lại danh sách đơn hàng"
           >
@@ -283,14 +285,12 @@ const OrderDetails = () => {
     ? 0
     : orderSteps.findIndex((s) => s.key === currentStepKey);
 
-  // Calculate subtotal from items
   const subtotal =
     order.items?.reduce(
       (sum, p) => sum + (p.discountedPrice || 0) * (p.quantity || 0),
       0
     ) || 0;
 
-  // Calculate discounts from voucherInfos and couponInfos
   const voucherDiscount =
     order.voucherInfos?.reduce((sum, v) => sum + (v.discountAmount || 0), 0) ||
     0;
@@ -301,21 +301,21 @@ const OrderDetails = () => {
 
   return (
     <div className="bg-white min-h-screen">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold text-gray-800">
+      <div className="max-w-7xl mx-auto px-2 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 md:py-8">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-6 gap-2 sm:gap-4">
+          <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-800">
             Đơn hàng #{order.orderCode || orderId}
           </h2>
-          <div className="flex items-center gap-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 w-full sm:w-auto">
             <div
-              className={`flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium shadow ${getStatusColor(order.status)}`}
+              className={`flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-medium shadow ${getStatusColor(order.status)}`}
             >
-              <span className="w-2 h-2 rounded-full bg-current"></span>
+              <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-current"></span>
               <span>{getStatusLabel(order.status)}</span>
             </div>
             {order.status === "pending" && (
               <button
-                className="px-3 py-1.5 text-sm font-medium bg-red-600 text-white rounded-md hover:bg-red-700 min-w-[80px] whitespace-nowrap"
+                className="px-2 sm:px-3 py-1 sm:py-1.5 text-xs sm:text-sm font-medium bg-red-600 text-white rounded-md hover:bg-red-700 w-full sm:w-auto"
                 onClick={handleOpenCancelModal}
                 aria-label={`Hủy đơn hàng ${order.orderCode || orderId}`}
               >
@@ -325,41 +325,39 @@ const OrderDetails = () => {
           </div>
         </div>
 
-        {/* User and Shipping Information */}
-        <div className="bg-white border border-gray-200 p-6 rounded-lg shadow-sm mb-8">
-          <h3 className="text-lg font-semibold mb-4 text-gray-700">
+        <div className="bg-white border border-gray-200 p-2 sm:p-4 rounded-lg shadow-sm mb-4 sm:mb-8">
+          <h3 className="text-sm sm:text-base md:text-lg font-semibold mb-2 sm:mb-4 text-gray-700">
             Thông tin người nhận
           </h3>
-          <p className="text-sm text-gray-700">
+          <p className="text-xs sm:text-sm text-gray-700">
             <strong className="font-semibold">Họ tên:</strong>{" "}
             {order.shippingAddress?.fullName || "Không xác định"}
           </p>
-          <p className="text-sm text-gray-700">
+          <p className="text-xs sm:text-sm text-gray-700">
             <strong className="font-semibold">Số điện thoại:</strong>{" "}
             {order.shippingAddress?.phone || "Không xác định"}
           </p>
-          <p className="text-sm text-gray-700">
+          <p className="text-xs sm:text-sm text-gray-700">
             <strong className="font-semibold">Địa chỉ:</strong>{" "}
             {order.shippingAddress
               ? `${order.shippingAddress.addressLine}, ${order.shippingAddress.ward}, ${order.shippingAddress.district}, ${order.shippingAddress.province}`
               : "Không xác định"}
           </p>
-          <p className="text-sm text-gray-700 mt-4">
+          <p className="text-xs sm:text-sm text-gray-700 mt-2">
             <strong className="font-semibold">Email:</strong>{" "}
             {order.userId?.email || "Không xác định"}
           </p>
         </div>
 
-        {/* Timeline */}
-        <div className="bg-white border border-gray-200 p-6 rounded-lg shadow-sm mb-8">
-          <h3 className="text-lg font-semibold mb-4 text-gray-700">
+        <div className="bg-white border border-gray-200 p-2 sm:p-4 rounded-lg shadow-sm mb-4 sm:mb-8">
+          <h3 className="text-sm sm:text-base md:text-lg font-semibold mb-2 sm:mb-4 text-gray-700">
             Tiến trình đơn hàng
           </h3>
-          <div className="relative flex items-center justify-between">
-            <div className="absolute top-6 left-[6%] right-[6%] h-1 bg-gray-300 z-0 rounded"></div>
+          <div className="relative sm:flex sm:items-center sm:justify-between flex-col sm:flex-row">
+            <div className="hidden sm:block absolute top-5 sm:top-6 left-[6%] right-[6%] h-0.5 sm:h-1 bg-gray-300 z-0 rounded"></div>
             {!isCancelled && !isReturn && (
               <div
-                className="absolute top-6 left-[6%] h-1 bg-green-500 z-0 rounded transition-all duration-300"
+                className="hidden sm:block absolute top-5 sm:top-6 left-[6%] h-0.5 sm:h-1 bg-green-500 z-0 rounded transition-all duration-300"
                 style={{
                   width: `calc(${(currentStepIndex / (orderSteps.length - 1)) * 88}%)`,
                 }}
@@ -367,13 +365,13 @@ const OrderDetails = () => {
             )}
             {isCancelled && (
               <div
-                className="absolute top-6 left-[6%] h-1 bg-red-500 z-0 rounded transition-all duration-300"
+                className="hidden sm:block absolute top-5 sm:top-6 left-[6%] h-0.5 sm:h-1 bg-red-500 z-0 rounded transition-all duration-300"
                 style={{ width: "0%" }}
               ></div>
             )}
             {isReturn && (
               <div
-                className="absolute top-6 left-[6%] h-1 bg-purple-500 z-0 rounded transition-all duration-300"
+                className="hidden sm:block absolute top-5 sm:top-6 left-[6%] h-0.5 sm:h-1 bg-purple-500 z-0 rounded transition-all duration-300"
                 style={{
                   width: `calc(${((orderSteps.length - 1) / (orderSteps.length - 1)) * 88}%)`,
                 }}
@@ -386,10 +384,10 @@ const OrderDetails = () => {
               return (
                 <div
                   key={step.key}
-                  className="relative flex flex-col items-center z-10 w-[16.66%]"
+                  className="relative flex flex-col items-center z-10 mb-4 sm:mb-0 sm:w-[16.66%]"
                 >
                   <div
-                    className={`w-12 h-12 flex items-center justify-center rounded-full border-2 mb-2 ${
+                    className={`w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-full border-2 mb-1 sm:mb-2 ${
                       isCancelled && index === 0
                         ? "bg-red-500 border-red-500 text-white"
                         : isReturn && index === orderSteps.length - 1
@@ -400,14 +398,14 @@ const OrderDetails = () => {
                     }`}
                   >
                     {isCancelled && index === 0 ? (
-                      <FaTimesCircle className="text-xl" />
+                      <FaTimesCircle className="text-base sm:text-lg" />
                     ) : isReturn && index === orderSteps.length - 1 ? (
-                      <FaUndo className="text-xl" />
+                      <FaUndo className="text-base sm:text-lg" />
                     ) : (
-                      <Icon className="text-xl" />
+                      <Icon className="text-base sm:text-lg" />
                     )}
                   </div>
-                  <div className="text-sm font-medium text-gray-800 text-center">
+                  <div className="text-xs sm:text-sm font-medium text-gray-800 text-center">
                     {isCancelled && index === 0
                       ? "Đã hủy"
                       : isReturn && index === orderSteps.length - 1
@@ -416,19 +414,19 @@ const OrderDetails = () => {
                           : "Đã trả hàng"
                         : step.label}
                   </div>
-                  <div className="h-5 mt-1"></div>
+                  <div className="h-4 sm:h-5 mt-1"></div>
                 </div>
               );
             })}
           </div>
           {isCancelled && (
-            <p className="mt-4 text-sm text-red-600">
+            <p className="mt-2 sm:mt-4 text-xs sm:text-sm text-red-600">
               Đơn hàng đã bị hủy. Lý do:{" "}
               {order.cancelReason || "Không xác định"}
             </p>
           )}
           {isReturn && (
-            <p className="mt-4 text-sm text-purple-600">
+            <p className="mt-2 sm:mt-4 text-xs sm:text-sm text-purple-600">
               {currentStatus === "return_requested"
                 ? "Đơn hàng đã yêu cầu trả hàng."
                 : "Đơn hàng đã được trả về kho."}
@@ -437,16 +435,15 @@ const OrderDetails = () => {
           )}
         </div>
 
-        {/* Order Details */}
-        <div className="bg-white border border-gray-200 p-6 rounded-lg shadow-sm">
-          <p className="mb-4 text-sm text-gray-700">
+        <div className="bg-white border border-gray-200 p-2 sm:p-4 rounded-lg shadow-sm">
+          <p className="mb-2 sm:mb-4 text-xs sm:text-sm text-gray-700">
             <strong className="font-semibold">Ngày đặt:</strong>{" "}
             {order.createdAt
               ? new Date(order.createdAt).toLocaleDateString("vi-VN")
               : "-"}
           </p>
           {order.cancelReason && (
-            <p className="mb-4 text-sm text-gray-700">
+            <p className="mb-2 sm:mb-4 text-xs sm:text-sm text-gray-700">
               <strong className="font-semibold">
                 {currentStatus === "cancelled" ? "Lý do hủy" : "Lý do trả hàng"}
                 :
@@ -454,12 +451,12 @@ const OrderDetails = () => {
               {order.cancelReason}
             </p>
           )}
-          <h4 className="text-lg font-semibold mb-4">Sản phẩm</h4>
-          <div className="space-y-4">
+          <h4 className="text-sm sm:text-base md:text-lg font-semibold mb-2 sm:mb-4">Sản phẩm</h4>
+          <div className="space-y-2 sm:space-y-4">
             {order.items?.map((product, idx) => (
               <div
                 key={idx}
-                className="flex gap-4 border border-gray-200 rounded-lg p-4 shadow-sm"
+                className="flex flex-col sm:flex-row gap-2 sm:gap-4 border border-gray-200 rounded-lg p-2 sm:p-4 shadow-sm"
               >
                 <img
                   src={
@@ -467,12 +464,12 @@ const OrderDetails = () => {
                     "https://via.placeholder.com/80x80?text=Img"
                   }
                   alt={product.name || "Sản phẩm"}
-                  className="w-20 h-20 object-cover rounded"
+                  className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 object-cover rounded self-center sm:self-start"
                 />
-                <div className="text-sm text-gray-700 flex-1">
-                  <div className="flex justify-between items-start gap-2">
+                <div className="text-xs sm:text-sm text-gray-700 flex-1">
+                  <div className="flex flex-col sm:flex-row sm:justify-between items-start gap-2">
                     <div>
-                      <h5 className="font-semibold text-base">
+                      <h5 className="font-semibold text-sm sm:text-base">
                         {product.name || "Không xác định"}
                       </h5>
                       <p>
@@ -494,23 +491,18 @@ const OrderDetails = () => {
                     </div>
                     {order.status === "delivered" && (
                       <button
-                        className={`px-3 py-1.5 text-sm font-medium rounded-md min-w-[80px] whitespace-nowrap ${
-                          product.hasReview
+                        className={`mt-1 sm:mt-0 px-2 sm:px-3 py-1 sm:py-1.5 text-xs sm:text-sm font-medium rounded-md w-full sm:w-auto ${
+                          order.hasReview
                             ? "bg-gray-400 text-white cursor-not-allowed"
                             : "bg-green-600 text-white hover:bg-green-700"
                         }`}
                         onClick={() =>
-                          !product.hasReview &&
+                          !order.hasReview &&
                           handleOpenReviewModal(product.productItemId)
                         }
-                        disabled={product.hasReview}
-                        aria-label={
-                          product.hasReview
-                            ? "Sản phẩm đã được đánh giá"
-                            : `Đánh giá sản phẩm ${product.name}`
-                        }
+                        disabled={order.hasReview}
                       >
-                        {product.hasReview ? "Đã đánh giá" : "Đánh giá"}
+                        {order.hasReview ? "Đã đánh giá" : "Đánh giá"}
                       </button>
                     )}
                   </div>
@@ -520,36 +512,35 @@ const OrderDetails = () => {
           </div>
         </div>
 
-        {/* Order Summary */}
-        <div className="mt-8 border-t pt-4 text-base text-gray-700">
-          <div className="flex justify-between py-1">
-            <span>Tổng tiền hàng</span>
-            <span>{formatCurrency(subtotal)}</span>
+        <div className="mt-4 sm:mt-6 border-t pt-2 sm:pt-4 text-xs sm:text-sm md:text-base text-gray-700">
+          <div className="flex flex-col sm:flex-row justify-between py-1 gap-1 sm:gap-2">
+            <span className="flex-shrink-0">Tổng tiền hàng</span>
+            <span className="text-right">{formatCurrency(subtotal)}</span>
           </div>
           {totalDiscount > 0 && (
-            <div className="flex justify-between py-1">
-              <span>Giảm giá (Voucher/Coupon)</span>
-              <span className="text-red-500">
+            <div className="flex flex-col sm:flex-row justify-between py-1 gap-1 sm:gap-2">
+              <span className="flex-shrink-0">Giảm giá (Voucher/Coupon)</span>
+              <span className="text-right text-red-500">
                 -{formatCurrency(totalDiscount)}
               </span>
             </div>
           )}
-          <div className="flex justify-between border-t pt-3 mt-3 text-lg font-semibold">
-            <span>Thành tiền</span>
-            <span className="text-red-600">
+          <div className="flex flex-col sm:flex-row justify-between border-t pt-2 sm:pt-3 mt-2 sm:mt-3 text-sm sm:text-base md:text-lg font-semibold gap-1 sm:gap-2">
+            <span className="flex-shrink-0">Thành tiền</span>
+            <span className="text-right text-red-600">
               {formatCurrency(order.totalAmount)}
             </span>
           </div>
-          <div className="flex justify-between pt-2 text-sm text-gray-600">
-            <span>Phương thức Thanh toán</span>
+          <div className="flex flex-col sm:flex-row justify-between pt-1 sm:pt-2 text-xs sm:text-sm text-gray-600 gap-1 sm:gap-2">
+            <span className="flex-shrink-0">Phương thức Thanh toán</span>
             <span className="text-right font-medium text-gray-800">
               {order.paymentMethod === "cod"
                 ? "Thanh toán khi nhận hàng"
                 : order.paymentMethod || "Chuyển khoản ngân hàng (MÃ QR)"}
             </span>
           </div>
-          <div className="flex justify-between pt-2 text-sm text-gray-600">
-            <span>Trạng thái thanh toán</span>
+          <div className="flex flex-col sm:flex-row justify-between pt-1 sm:pt-2 text-xs sm:text-sm text-gray-600 gap-1 sm:gap-2">
+            <span className="flex-shrink-0">Trạng thái thanh toán</span>
             <span className="text-right font-medium text-gray-800">
               {order.paymentStatus === "pending"
                 ? "Chưa thanh toán"
@@ -562,7 +553,6 @@ const OrderDetails = () => {
           </div>
         </div>
 
-        {/* Cancel Reason Modal */}
         {showCancelModal && (
           <div
             className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
@@ -570,30 +560,32 @@ const OrderDetails = () => {
             aria-modal="true"
             aria-label="Modal hủy đơn hàng"
           >
-            <div className="bg-white p-6 rounded-lg shadow-lg border border-gray-200 max-w-md w-full">
-              <h3 className="text-lg font-semibold mb-4">Hủy đơn hàng</h3>
-              <p className="text-sm text-gray-600 mb-4">
+            <div className="bg-white p-2 sm:p-4 rounded-lg shadow-lg border border-gray-200 max-w-[90vw] sm:max-w-md w-full">
+              <h3 className="text-sm sm:text-base md:text-lg font-semibold mb-2 sm:mb-4">
+                Hủy đơn hàng
+              </h3>
+              <p className="text-xs sm:text-sm text-gray-600 mb-2 sm:mb-4">
                 Vui lòng nhập lý do hủy đơn hàng:
               </p>
               <textarea
                 value={cancelReason}
                 onChange={(e) => setCancelReason(e.target.value)}
-                className="w-full p-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                rows="4"
+                className="w-full p-1 sm:p-2 border border-gray-200 rounded-md text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                rows="3"
                 placeholder="Nhập lý do hủy..."
                 aria-label="Lý do hủy đơn hàng"
               />
-              <div className="flex justify-end gap-3 mt-4">
+              <div className="flex flex-col sm:flex-row justify-end gap-2 sm:gap-3 mt-2 sm:mt-4">
                 <button
                   onClick={handleCloseCancelModal}
-                  className="px-4 py-2 text-sm font-medium bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300"
+                  className="px-2 sm:px-4 py-1 sm:py-2 text-xs sm:text-sm font-medium bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300"
                   aria-label="Hủy bỏ thao tác"
                 >
                   Hủy
                 </button>
                 <button
                   onClick={handleCancelOrder}
-                  className="px-4 py-2 text-sm font-medium bg-red-600 text-white rounded-md hover:bg-red-700"
+                  className="px-2 sm:px-4 py-1 sm:py-2 text-xs sm:text-sm font-medium bg-red-600 text-white rounded-md hover:bg-red-700"
                   aria-label="Xác nhận hủy đơn hàng"
                 >
                   Xác nhận hủy
@@ -603,7 +595,6 @@ const OrderDetails = () => {
           </div>
         )}
 
-        {/* Review Modal */}
         {showReviewModal && (
           <div
             className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
@@ -611,16 +602,18 @@ const OrderDetails = () => {
             aria-modal="true"
             aria-label="Modal đánh giá sản phẩm"
           >
-            <div className="bg-white p-6 rounded-lg shadow-lg border border-gray-200 max-w-md w-full">
-              <h3 className="text-lg font-semibold mb-4">Đánh giá sản phẩm</h3>
-              <p className="text-sm text-gray-600 mb-4">
+            <div className="bg-white p-2 sm:p-4 rounded-lg shadow-lg border border-gray-200 max-w-[90vw] sm:max-w-md w-full">
+              <h3 className="text-sm sm:text-base md:text-lg font-semibold mb-2 sm:mb-4">
+                Đánh giá sản phẩm
+              </h3>
+              <p className="text-xs sm:text-sm text-gray-600 mb-2 sm:mb-4">
                 Vui lòng chọn số sao và nhập nội dung đánh giá:
               </p>
-              <div className="flex gap-1 mb-4">
+              <div className="flex gap-1 mb-2 sm:mb-4">
                 {[1, 2, 3, 4, 5].map((star) => (
                   <FaStar
                     key={star}
-                    className={`text-2xl cursor-pointer ${
+                    className={`text-lg sm:text-xl cursor-pointer ${
                       star <= rating ? "text-yellow-400" : "text-gray-300"
                     }`}
                     onClick={() => setRating(star)}
@@ -631,22 +624,22 @@ const OrderDetails = () => {
               <textarea
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}
-                className="w-full p-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                rows="4"
+                className="w-full p-1 sm:p-2 border border-gray-200 rounded-md text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                rows="3"
                 placeholder="Nhập nội dung đánh giá..."
                 aria-label="Nội dung đánh giá sản phẩm"
               />
-              <div className="flex justify-end gap-3 mt-4">
+              <div className="flex flex-col sm:flex-row justify-end gap-2 sm:gap-3 mt-2 sm:mt-4">
                 <button
                   onClick={handleCloseReviewModal}
-                  className="px-4 py-2 text-sm font-medium bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300"
+                  className="px-2 sm:px-4 py-1 sm:py-2 text-xs sm:text-sm font-medium bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300"
                   aria-label="Hủy bỏ đánh giá"
                 >
                   Hủy
                 </button>
                 <button
                   onClick={handleSubmitReview}
-                  className="px-4 py-2 text-sm font-medium bg-green-600 text-white rounded-md hover:bg-green-700"
+                  className="px-2 sm:px-4 py-1 sm:py-2 text-xs sm:text-sm font-medium bg-green-600 text-white rounded-md hover:bg-green-700"
                   aria-label="Gửi đánh giá sản phẩm"
                 >
                   Gửi đánh giá

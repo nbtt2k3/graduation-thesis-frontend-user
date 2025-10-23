@@ -40,30 +40,47 @@ const Orders = () => {
     const fetchOrders = async () => {
       try {
         const response = await apiGetUserOrder();
+        console.log("📦 API trả về:", response);
+
         if (response.success && Array.isArray(response.userOrderList)) {
-          const mappedOrders = response.userOrderList.map((order) => ({
-            id_order: order._id,
-            hasReview: order.hasReview || {},
-            products: order.items.map((item) => ({
-              productItemId: item.productItemId,
-              name: item.name,
-              image: item.image,
-              price: item.discountedPrice,
-              quantity: item.quantity,
-              attributes: item.attributes.map((attr) => ({
-                code: attr.code,
-                value: attr.value,
-              })),
-              hasReview: item.hasReview || false,
-            })),
-            status: order.status?.toLowerCase() || "unknown",
-            date: order.createdAt,
-            paymentMethod: order.paymentMethod,
-            totalAmount: order.totalAmount,
-            cancel_reason: order.cancelReason || null,
-            userVoucherId: order.userVoucherId || null,
-            couponId: order.couponId || null,
-          }));
+          const mappedOrders = response.userOrderList.map((order) => {
+            console.log("➡️ Order ID:", order._id, "Status:", order.status);
+            return {
+              id_order: order._id,
+              hasReview: order.hasReview || false, // 🟢 giữ ở cấp order
+              products: order.items.map((item) => {
+                console.log(
+                  "   🛒 Sản phẩm:",
+                  item.name,
+                  "| productItemId:",
+                  item.productItemId,
+                  "| hasReview (API):",
+                  item.hasReview
+                );
+                return {
+                  productItemId: item.productItemId,
+                  name: item.name,
+                  image: item.image,
+                  price: item.discountedPrice,
+                  quantity: item.quantity,
+                  attributes: item.attributes.map((attr) => ({
+                    code: attr.code,
+                    value: attr.value,
+                  })),
+                  hasReview: order.hasReview === true,
+                };
+              }),
+              status: order.status?.toLowerCase() || "unknown",
+              date: order.createdAt,
+              paymentMethod: order.paymentMethod,
+              totalAmount: order.totalAmount,
+              cancel_reason: order.cancelReason || null,
+              userVoucherId: order.userVoucherId || null,
+              couponId: order.couponId || null,
+            };
+          });
+
+          console.log("✅ mappedOrders sau khi xử lý:", mappedOrders);
           setUserOrders(mappedOrders);
         } else {
           throw new Error("Dữ liệu đơn hàng không hợp lệ.");
@@ -164,20 +181,29 @@ const Orders = () => {
         comment,
       });
       if (response.success) {
-        setUserOrders((prevOrders) =>
-          prevOrders.map((order) =>
+        console.log(
+          "🟢 Gửi đánh giá thành công cho productItemId:",
+          selectedProductId
+        );
+
+        setUserOrders((prevOrders) => {
+          const updatedOrders = prevOrders.map((order) =>
             order.id_order === selectedOrderId
               ? {
                   ...order,
                   products: order.products.map((product) =>
-                    product.productItemId === selectedProductId
+                    product.productItemId?.toString() ===
+                    selectedProductId?.toString()
                       ? { ...product, hasReview: true }
                       : product
                   ),
                 }
               : order
-          )
-        );
+          );
+          console.log("🔄 Sau khi cập nhật state:", updatedOrders);
+          return updatedOrders;
+        });
+
         toast.success("Đánh giá đã được gửi thành công!");
         handleCloseReviewModal();
       } else {
@@ -245,10 +271,7 @@ const Orders = () => {
                 <div className="flex flex-wrap gap-4">
                   {/* PRODUCT LIST */}
                   {order.products?.map((product, idx) => (
-                    <div
-                      key={idx}
-                      className="flex gap-4 w-full sm:w-1/2 mb-3"
-                    >
+                    <div key={idx} className="flex gap-4 w-full sm:w-1/2 mb-3">
                       <img
                         src={
                           product.image ||
@@ -265,7 +288,8 @@ const Orders = () => {
                             </h5>
                             <div className="flex flex-wrap gap-2 text-sm text-gray-600">
                               <p>
-                                Giá: {product.price?.toLocaleString("vi-VN") || 0}{" "}
+                                Giá:{" "}
+                                {product.price?.toLocaleString("vi-VN") || 0}{" "}
                                 {currency || "₫"}
                               </p>
                               {product.attributes?.map((attr, attrIdx) => (
@@ -278,7 +302,7 @@ const Orders = () => {
                           </div>
                           {order.status === "delivered" && (
                             <button
-                              className={`px-3 py-1.5 text-sm font-medium rounded-md min-w-[80px] whitespace-nowrap ${
+                              className={`px-3 py-1.5 text-sm font-medium rounded-md min-w-[110px] text-center whitespace-nowrap ${
                                 product.hasReview
                                   ? "bg-gray-400 text-white cursor-not-allowed"
                                   : "bg-green-600 text-white hover:bg-green-700"
@@ -344,13 +368,16 @@ const Orders = () => {
                   </div>
                   <div className="flex items-center gap-3">
                     <span className="font-semibold text-sm">
-                      Tổng tiền: {order.totalAmount?.toLocaleString("vi-VN") || 0}{" "}
+                      Tổng tiền:{" "}
+                      {order.totalAmount?.toLocaleString("vi-VN") || 0}{" "}
                       {currency || "₫"}
                     </span>
                     {order.status === "pending" && (
                       <button
                         className="px-3 py-1.5 text-sm font-medium bg-red-600 text-white rounded-md hover:bg-red-700 min-w-[80px] whitespace-nowrap"
-                        onClick={(e) => handleOpenCancelModal(order.id_order, e)}
+                        onClick={(e) =>
+                          handleOpenCancelModal(order.id_order, e)
+                        }
                         aria-label={`Hủy đơn hàng ${order.id_order}`}
                       >
                         Hủy đơn hàng
