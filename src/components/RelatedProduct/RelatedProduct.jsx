@@ -34,6 +34,13 @@ const RelatedProduct = ({ productItemId }) => {
       // Ưu tiên lấy từ mô hình MF (Python API)
       const responseSimilar = await apiGetSimilarItems(productItemId);
 
+      console.log("🔍 Danh sách sản phẩm tương tự từ backend:");
+      responseSimilar.data.recommendedProductList.forEach((p, i) => {
+        console.log(
+          `#${i + 1}. ${p.name || "Không tên"} (similarity_score=${p.similarity_score})`
+        );
+      });
+
       if (
         responseSimilar?.success &&
         responseSimilar?.data?.success &&
@@ -41,9 +48,9 @@ const RelatedProduct = ({ productItemId }) => {
         responseSimilar.data.recommendedProductList.length > 0
       ) {
         // ✅ Sắp xếp theo similarity_score giảm dần
-        const sortedList = [...responseSimilar.data.recommendedProductList].sort(
-          (a, b) => (b.similarity_score || 0) - (a.similarity_score || 0)
-        );
+        const sortedList = [
+          ...responseSimilar.data.recommendedProductList,
+        ].sort((a, b) => (b.similarity_score || 0) - (a.similarity_score || 0));
         setProductItems(sortedList);
       } else {
         // 🔁 Fallback sang API sản phẩm liên quan

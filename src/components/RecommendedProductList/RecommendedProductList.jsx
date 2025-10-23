@@ -40,7 +40,7 @@ const RecommendedProductList = () => {
       // ✅ Log thứ tự để kiểm tra
       console.log("🔍 Danh sách sản phẩm từ backend (đã sắp theo predicted_rating):");
       response.data.recommendedProductList.forEach((p, i) => {
-        console.log(`#${i + 1}. ${p.name || "Không tên"} (${p.predicted_rating || "?"})`);
+        console.log(`#${i + 1}. ${p.name || "Không tên"} | predicted_rating=${p.predicted_rating || "?"}`);
       });
 
     } catch (error) {
